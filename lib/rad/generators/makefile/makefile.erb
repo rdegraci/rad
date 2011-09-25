@@ -67,15 +67,16 @@ SOFTWARE_SERIAL = <%= params['arduino_root'] %>/Contents/Resources/Java/librarie
 LIBRARY_ROOT = <%= params['libraries_root'] %>
 SRC = $(ARDUINO)/pins_arduino.c $(ARDUINO)/wiring.c \
 $(ARDUINO)/wiring_analog.c $(ARDUINO)/wiring_digital.c \
-$(ARDUINO)/wiring_pulse.c $(ARDUINO)/wiring_serial.c \
+$(ARDUINO)/wiring_pulse.c \
 $(ARDUINO)/wiring_shift.c $(ARDUINO)/WInterrupts.c <%= params['twi_c'] %>
 CXXSRC = $(ARDUINO)/HardwareSerial.cpp $(SOFTWARE_SERIAL)/SoftwareSerial.cpp $(ARDUINO)/Print.cpp<%= params['libraries'].collect{|l| " $(LIBRARY_ROOT)/#{ l }/#{l }.cpp"}.join('') %>
 MCU = <%= params['mcu'] %>
 <% if params['asm_files'] %>ASRC = <%= params['asm_files'].join(' ') %><% end %>
 F_CPU = 16000000
 FORMAT = ihex
-UPLOAD_RATE = 19200
+UPLOAD_RATE = 115200
 BIN_DIR = <%= params['arduino_root'] %>/Contents/Resources/Java/hardware/tools/avr/bin
+ARDUINO_CONF = <%=params['arduino_root']%>/Contents/Resources/Java/hardware/tools/avr/etc/avrdude.conf
 
 # Name of this Makefile (used for "make depend").
 MAKEFILE = Makefile
@@ -115,9 +116,10 @@ LDFLAGS = -lm
 # Programming support using avrdude. Settings and variables.
 AVRDUDE_PROGRAMMER = stk500
 AVRDUDE_PORT = $(PORT)
-AVRDUDE_WRITE_FLASH = -D -U flash:w:$(TARGET).hex
-AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) \
-  -b $(UPLOAD_RATE) -C <%= params['arduino_root'] %>/hardware/tools/avr/etc/avrdude.conf
+AVRDUDE_WRITE_FLASH = -D -U flash:w:$(TARGET).hex:i
+AVRDUDE_FLAGS = -C$(ARDUINO_CONF) -v -v -v -v \
+-p$(MCU) -c$(AVRDUDE_PROGRAMMER) -P$(AVRDUDE_PORT) -b$(UPLOAD_RATE)
+
 
 # Program settings
 CC = $(BIN_DIR)/avr-gcc

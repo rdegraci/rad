@@ -24,11 +24,11 @@ class OptionParser #:nodoc:
     
     options = {"hardware" => {
                 "serial_port"      => '/dev/tty.usbserial*', 
-                "mcu"              => "atmega168", 
+                "mcu"              => "atmega328p", 
                 "physical_reset"   => false
                 },
                 "software" => {
-                  "arduino_root"   => "/Applications/arduino-0012"
+                  "arduino_root"   => "/Applications/Arduino.app"
                  }
                }
     
@@ -255,18 +255,20 @@ else
   FileUtils.touch "#{sketch_name}/#{sketch_name}.rb"
   File.open("#{sketch_name}/#{sketch_name}.rb", "w") do |file|
     file << <<-EOS
-  class #{sketch_name.split("_").collect{|c| c.capitalize}.join("")} < ArduinoSketch
+class #{sketch_name.split("_").collect{|c| c.capitalize}.join("")} < ArduinoSketch
     
-    # looking for hints?  check out the examples directory
-    # example sketches can be uploaded to your arduino with
-    # rake make:upload sketch=examples/hello_world
-    # just replace hello_world with other examples
+  # looking for hints?  check out the examples directory
+  # example sketches can be uploaded to your arduino with
+  # rake make:upload sketch=examples/hello_world
+  # just replace hello_world with other examples
     
-      def loop
-       # your code here
-      end
-      
+  output_pin 13, :as => :led
+
+  def loop
+    blink led, 10
   end
+      
+end
     EOS
   end
   puts "Added #{sketch_name}/#{sketch_name}.rb"
@@ -295,8 +297,8 @@ else
   puts "Run 'rake -T' inside your sketch dir to learn how to compile and upload it."
   
   puts "***************************************************"
-  puts "***     Please note: This version supports      ***"
-  puts "***            Arduino 12 only!                 ***"
+  puts "***     Please note: This version has been      ***"
+  puts "***            Arduino 22 Mac OSX               ***"
   puts "***   run rad install arduino to upgrade        ***"
   puts "***************************************************"
 end
